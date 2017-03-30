@@ -1,37 +1,5 @@
-<html>
-<head>
-  <title>Remember Prayers</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-</head>
-<body>
-<div class="navbar navbar-default navbar-fixed-top">
-  <div class="container">
-    <div class="navbar-header">
-      <a href="./" class="navbar-brand">Remember Prayers</a>
-      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-    </div>
-    <div class="navbar-collapse collapse" id="navbar-main">
-      <ul class="nav navbar-nav">
-        <li><a href="../">Top</a></li>
-        <li><a href="../">Ranking</a></li>
-        <li><a href="../">Upload</a></li>
-      </ul>
-
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="">My Page</a></li>
-        <li><a href="">Logout</a></li>
-      </ul>
-
-    </div>
-  </div>
-</div>
-
+{% extends "layout.html" %}
+{% block content %}
 <div class="container">
   <div class="row">
     <div class="col-lg-12">
@@ -101,8 +69,4 @@
     </div>
   </div>
 </div>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-</body>
-</html>
+{% endblock %}
