@@ -11,8 +11,9 @@ app = Flask(__name__)
 app.config.update(
     APPLICATON_ROOT='/remember_prayers',
     SECRET_KEY=bytes.fromhex(environ['RP_SESSION_KEY']),
-    SQLALCHEMY_DATABASE_URI='sqlite:///test.db',
-    DEBUG=True
+    SQLALCHEMY_DATABASE_URI='sqlite:///database.db',
+    DEBUG=True,
+    SQLALCHEMY_ECHO=True
 )
 
 db = SQLAlchemy(app)
@@ -29,11 +30,12 @@ twitter = OAuth1Service(
 
 class User(db.Model):
     __tablename__ = 'users'
-    user_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
+    pray = db.relationship('Pray') 
 
-    def __init__(self, twitter_id, name):
-        self.user_id = user_id
+    def __init__(self, id, name):
+        self.id = id
         self.name = name
 
     def __repr__(self):
@@ -41,8 +43,9 @@ class User(db.Model):
 
 class Company(db.Model):
     __tablename__ = 'companies'
-    company_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
+    pray = db.relationship('Pray') 
 
     def __init__(self, name):
         self.name = name
@@ -53,8 +56,8 @@ class Company(db.Model):
 class Pray(db.Model):
     __tablename__ = 'pray'
     pray_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    company_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
     date = db.Column(db.Date)
 
     def __init__(self, user_id, company_id, date):
@@ -73,7 +76,8 @@ def auth_render_template(html_path):
     
 @app.route('/')
 def index():
-    return render_template('index.html')
+    rank_table = db.session.query(Pray, db.func.count().label('amount')).join(User).add_columns(User.name).group_by(Pray.user_id).order_by('amount desc').limit(5).all()
+    return render_template('index.html', rank_table=rank_table)
 
 @app.route('/login')
 def login():
@@ -110,6 +114,11 @@ def authorized():
     session['username'] = verify['screen_name']
     session['id'] = verify['id']
 
+    if User.query.filter_by(id=session['id']).first() is None:
+        user = User(session['id'], session['username'])
+        db.session.add(user)
+        db.session.commit()
+
     flash('Logged in as ' + verify['name'])
     return redirect(url_for('index'))
 
@@ -121,7 +130,7 @@ def logout():
 @app.route('/mypage')
 def mypage():
     if 'id' in session:
-        pray_list = Pray.query.filter_by(user_id = session['id']).join(Company, Pray.company_id==Company.company_id).add_columns(Company.name, Pray.date).all()
+        pray_list = Pray.query.filter_by(user_id=session['id']).join(Company).add_columns(Company.name, Pray.date).all()
         print(pray_list)
         return render_template('mypage.html', pray_list=pray_list)
     else:
@@ -146,9 +155,9 @@ def submit():
             c = Company(prayer)
             db.session.add(c)
             db.session.commit()
-            company_id = c.company_id
+            company_id = c.id
         else:
-            company_id = company.company_id
+            company_id = company.id
 
         d = datetime.strptime(datestr, '%Y/%m/%d').date()
         pray = Pray(session['id'], company_id, d)
@@ -159,7 +168,8 @@ def submit():
 
 @app.route('/ranking')
 def ranking():
-    return render_template('ranking.html')
+    rank_table = db.session.query(Pray, db.func.count().label('amount')).join(User).add_columns(User.name).group_by(Pray.user_id).order_by('amount desc').all()
+    return render_template('ranking.html', rank_table=rank_table)
 
 if __name__ == '__main__':
     app.run()
