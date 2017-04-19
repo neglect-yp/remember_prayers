@@ -3,7 +3,8 @@
   <title>Remember Prayers</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" type="text/css" href="./static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./static/bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./static/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css">
 </head>
 <body>
 <div class="navbar navbar-default navbar-fixed-top">
@@ -18,9 +19,8 @@
     </div>
     <div class="navbar-collapse collapse" id="navbar-main">
       <ul class="nav navbar-nav">
-        <li><a href="./test">Top</a></li>
-        <li><a href="../">Ranking</a></li>
-        <li><a href="../">Upload</a></li>
+        <li><a href="./ranking">Ranking</a></li>
+        <li><a href="./submit">Upload</a></li>
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
@@ -38,7 +38,16 @@
 
 {% block content %}{% endblock %}
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="./static/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="./static/bower_components/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="./static/bower_components/moment/min/moment.min.js"></script>
+<script type="text/javascript" src="./static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="./static/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript">
+$(function () {
+  $('#datetimepicker1').datetimepicker({
+    format: 'YYYY/MM/DD'
+  });
+});
+</script>
 </body>
 </html>

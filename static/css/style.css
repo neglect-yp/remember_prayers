@@ -1,0 +1,27 @@
+input[type=date]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+input[type=date]::-webkit-datetime-edit-year-field:not([aria-valuenow]),
+input[type=date]::-webkit-datetime-edit-month-field:not([aria-valuenow]),
+input[type=date]::-webkit-datetime-edit-day-field:not([aria-valuenow]) {
+  color: transparent;
+}
+input[type=date]::-webkit-datetime-edit-text {
+  color: #666;
+}
+input[type=date]::-webkit-clear-button {
+  -webkit-appearance: none;
+}
+input[type=date]::-webkit-calendar-picker-indicator {
+  color: transparent;
+  position: relative;
+}
+input[type=date]::-webkit-calendar-picker-indicator:before {
+  color: #666;
+  font-family: FontAwesome;
+  content: "\f073"; /* fa-calendar */
+  /*content: "\f133";*/ /* fa-calendar-o */
+  position: absolute;
+  left: -5px;
+  top: -5px;
+}
