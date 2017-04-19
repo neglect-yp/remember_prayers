@@ -63,7 +63,7 @@ class Pray(db.Model):
         self.date = date
 
     def __repr__(self):
-        return '<Pray from %r to %r>' % (self.company, self.user_id)
+        return '<Pray from %r to %r>' % (self.company_id, self.user_id)
 
 def auth_render_template(html_path):
     if 'id' in session:
@@ -120,35 +120,40 @@ def logout():
 
 @app.route('/mypage')
 def mypage():
-    return auth_render_template('mypage.html')
+    if 'id' in session:
+        pray_list = Pray.query.filter_by(user_id = session['id']).join(Company, Pray.company_id==Company.company_id).add_columns(Company.name, Pray.date).all()
+        print(pray_list)
+        return render_template('mypage.html', pray_list=pray_list)
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/submit', methods=['GET', 'POST'])
 def submit():
     if 'id' in session and request.method == 'POST'\
-            and 'prayer' in request.form and 'date' in request.form:
-            prayer = request.form['prayer']
-            datestr = request.form['date']
+        and 'prayer' in request.form and 'date' in request.form:
+        prayer = request.form['prayer']
+        datestr = request.form['date']
 
-            # date validation check
-            if re.compile('\A\d{4}/\d{2}/\d{2}\Z').match(datestr) is None:
-                flash('Invalid date format')
-                return redirect(url_for('index'))
+        # date validation check
+        if re.compile('\A\d{4}/\d{2}/\d{2}\Z').match(datestr) is None:
+            flash('Invalid date format')
+            return redirect(url_for('index'))
 
-            # company already exists?
-            company = Company.query.filter_by(name=prayer).first()
-            if company is None:
-                # not exists -> insert
-                c = Company(prayer)
-                db.session.add(c)
-                db.session.commit()
-                company_id = c.company_id
-            else:
-                company_id = company.company_id
-
-            d = datetime.strptime(datestr, '%Y/%m/%d').date()
-            pray = Pray(session['id'], company_id, d)
-            db.session.add(pray)
+        # company already exists?
+        company = Company.query.filter_by(name=prayer).first()
+        if company is None:
+            # not exists -> insert
+            c = Company(prayer)
+            db.session.add(c)
             db.session.commit()
+            company_id = c.company_id
+        else:
+            company_id = company.company_id
+
+        d = datetime.strptime(datestr, '%Y/%m/%d').date()
+        pray = Pray(session['id'], company_id, d)
+        db.session.add(pray)
+        db.session.commit()
 
     return auth_render_template('submit.html')
 
